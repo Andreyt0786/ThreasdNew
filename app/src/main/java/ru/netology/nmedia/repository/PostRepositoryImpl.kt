@@ -18,7 +18,7 @@ class PostRepositoryImpl : PostRepository {
     private val typeToken = object : TypeToken<List<Post>>() {}
 
     companion object {
-        private const val BASE_URL = "http://192.168.0.16:9090"
+        private const val BASE_URL = "http://192.168.0.14:9090"
         private val jsonType = "application/json".toMediaType()
     }
 
@@ -35,7 +35,7 @@ class PostRepositoryImpl : PostRepository {
             }
     }
 
-    override fun likeById(post: Post) {
+    override fun likeById(post: Post):Post {
 
         if (!post.likedByMe) {
             val request: Request = Request.Builder()
@@ -45,7 +45,10 @@ class PostRepositoryImpl : PostRepository {
 
             return client.newCall(request)
                 .execute()
-                .close()
+                .let { it.body?.string() ?: throw RuntimeException("body is null") }
+                .let {
+                    gson.fromJson(it, Post::class.java)
+                }
 
         } else {
             val request: Request = Request.Builder()
@@ -55,7 +58,11 @@ class PostRepositoryImpl : PostRepository {
 
             return client.newCall(request)
                 .execute()
-                .close()
+                .let { it.body?.string() ?: throw RuntimeException("body is null") }
+                .let {
+                   gson.fromJson(it, Post::class.java)
+
+                }
         }
     }
 
