@@ -2,6 +2,7 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import com.bumptech.glide.Glide
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModel
 import ru.netology.nmedia.repository.*
@@ -15,7 +16,8 @@ private val empty = Post(
     author = "",
     likedByMe = false,
     likes = 0,
-    published = ""
+    published = "",
+    authorAvatar = ""
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -34,29 +36,30 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun loadPosts() {
-        _data.value= FeedModel(loading=true)
-        repository.getAll(object:PostRepository.GetAllCallBack<List<Post>>{
+        _data.value = FeedModel(loading = true)
+        repository.getAll(object : PostRepository.GetAllCallBack<List<Post>> {
             override fun onSuccess(data: List<Post>) {
-                _data.postValue(FeedModel(posts=data,empty=data.isEmpty()))
+                _data.postValue(FeedModel(posts = data, empty = data.isEmpty()))
             }
+
             override fun onError(e: Exception) {
-              _data.postValue(FeedModel(error=true))
+                _data.postValue(FeedModel(error = true))
             }
         })
     }
 
-        /*thread {
-            // Начинаем загрузку
-            _data.postValue(FeedModel(loading = true))
-            try {
-                // Данные успешно получены
-                val posts = repository.getAll()
-                FeedModel(posts = posts, empty = posts.isEmpty())
-            } catch (e: IOException) {
-                // Получена ошибка
-                FeedModel(error = true)
-            }.also(_data::postValue)
-        }*/
+    /*thread {
+        // Начинаем загрузку
+        _data.postValue(FeedModel(loading = true))
+        try {
+            // Данные успешно получены
+            val posts = repository.getAll()
+            FeedModel(posts = posts, empty = posts.isEmpty())
+        } catch (e: IOException) {
+            // Получена ошибка
+            FeedModel(error = true)
+        }.also(_data::postValue)
+    }*/
 
 
     fun save() {
@@ -78,7 +81,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
             })
         }
-            edited.value = empty
+        edited.value = empty
     }
 
     fun edit(post: Post) {
@@ -112,27 +115,27 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             override fun onError(e: Exception) {
-                _data.postValue(FeedModel(error=true))
+                _data.postValue(FeedModel(error = true))
             }
         })
     }
 
-    fun removeById(id: Long,) {
-      /*  thread {
-            // Оптимистичная модель
-            val old = _data.value?.posts.orEmpty()
-            _data.postValue(
-                _data.value?.copy(posts = _data.value?.posts.orEmpty()
-                    .filter { it.id != id }
-                )
-            )
-            try {
-                repository.removeById(id)
-            } catch (e: IOException) {
-                _data.postValue(_data.value?.copy(posts = old))
-            }
-        }*/
-        repository.removeById(id,object : PostRepository.GetAllCallBack<Unit> {
+    fun removeById(id: Long) {
+        /*  thread {
+              // Оптимистичная модель
+              val old = _data.value?.posts.orEmpty()
+              _data.postValue(
+                  _data.value?.copy(posts = _data.value?.posts.orEmpty()
+                      .filter { it.id != id }
+                  )
+              )
+              try {
+                  repository.removeById(id)
+              } catch (e: IOException) {
+                  _data.postValue(_data.value?.copy(posts = old))
+              }
+          }*/
+        repository.removeById(id, object : PostRepository.GetAllCallBack<Unit> {
             override fun onSuccess(data: Unit) {
                 _data.postValue(
                     _data.value?.copy(posts = _data.value?.posts.orEmpty()
