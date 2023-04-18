@@ -2,6 +2,10 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
@@ -29,19 +33,40 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         get() = _state
     val data: LiveData<FeedPosts> =
         repository.data.map { FeedPosts(posts = it, empty = it.isEmpty()) }
+            .asLiveData(Dispatchers.Default)
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
+    var lastId=0L
+    val newer: LiveData<Int> = data.switchMap {
+        repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
+            .catch { e -> e.printStackTrace() }
+            .asLiveData(Dispatchers.Default)
+    }
+
     init {
         loadPosts()
+    }
+
+    fun updateFromDao() = viewModelScope.launch {
+        repository.updateDao()
+        delay(2000)
+        repository.getAll()
+        delay(500)
+        val new: LiveData<Int> = data.switchMap {
+            lastId = it.posts.lastOrNull()?.id ?: 0L
+            repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
+                .catch { e -> e.printStackTrace() }
+                .asLiveData(Dispatchers.Default)
+        }
     }
 
     fun loadPosts() = viewModelScope.launch {
         try {
             _state.value = FeedModelState(loading = true)
-            val posts = repository.getAll()
+            repository.getAll()
             _state.value = FeedModelState()
         } catch (e: Exception) {
             _state.value = FeedModelState(error = true)
@@ -137,36 +162,36 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 }
 
 
-        /*  thread {
-          // Оптимистичная модель
-          val old = _state.value?.posts.orEmpty()
-          _state.postValue(
-              _state.value?.copy(posts = _state.value?.posts.orEmpty()
-                  .filter { it.id != id }
-              )
-          )
-          try {
-              repository.removeById(id)
-          } catch (e: IOException) {
-              _state.postValue(_state.value?.copy(posts = old))
-          }
-      }*/
+/*  thread {
+  // Оптимистичная модель
+  val old = _state.value?.posts.orEmpty()
+  _state.postValue(
+      _state.value?.copy(posts = _state.value?.posts.orEmpty()
+          .filter { it.id != id }
+      )
+  )
+  try {
+      repository.removeById(id)
+  } catch (e: IOException) {
+      _state.postValue(_state.value?.copy(posts = old))
+  }
+}*/
 
 
-        /*repository.removeById(id, object : PostRepository.GetAllCallBack<Unit> {
-        override fun onSuccess(data: Unit) {
-            _state.postValue(
-                _state.value?.copy(posts = _state.value?.posts.orEmpty()
-                    .filter { it.id != id }
-                )
-            )
-        }
+/*repository.removeById(id, object : PostRepository.GetAllCallBack<Unit> {
+override fun onSuccess(data: Unit) {
+    _state.postValue(
+        _state.value?.copy(posts = _state.value?.posts.orEmpty()
+            .filter { it.id != id }
+        )
+    )
+}
 
-        override fun onError(e: Exception) {
-            _state.postValue(FeedModelState(error = true))
-        }
+override fun onError(e: Exception) {
+    _state.postValue(FeedModelState(error = true))
+}
 
-    })
+})
 }*/
 
 
