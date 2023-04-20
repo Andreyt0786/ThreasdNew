@@ -39,8 +39,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    var lastId=0L
+    var lastId = 0L
     val newer: LiveData<Int> = data.switchMap {
+        lastId = it.posts.lastOrNull()?.id ?: 0L
         repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
             .catch { e -> e.printStackTrace() }
             .asLiveData(Dispatchers.Default)
@@ -52,15 +53,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateFromDao() = viewModelScope.launch {
         repository.updateDao()
-        delay(2000)
-        repository.getAll()
-        delay(500)
-        val new: LiveData<Int> = data.switchMap {
-            lastId = it.posts.lastOrNull()?.id ?: 0L
-            repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
-                .catch { e -> e.printStackTrace() }
-                .asLiveData(Dispatchers.Default)
-        }
+        /*  delay(2000)
+          repository.getAll()
+          delay(500)
+          val new: LiveData<Int> = data.switchMap {
+              lastId = it.posts.lastOrNull()?.id ?: 0L
+              repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
+                  .catch { e -> e.printStackTrace() }
+                  .asLiveData(Dispatchers.Default)
+          }*/
     }
 
     fun loadPosts() = viewModelScope.launch {

@@ -85,7 +85,6 @@ class FeedFragment : Fragment() {
         binding.getNewPost.setOnClickListener {
             viewModel.updateFromDao()
             binding.newPostGroup.isVisible = false
-            count = 0
             binding.list.smoothScrollToPosition(viewModel.lastId.toInt())
         }
 
