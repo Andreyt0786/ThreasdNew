@@ -2,6 +2,11 @@ package ru.netology.nmedia.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import okhttp3.internal.platform.android.AndroidLogHandler.close
 import retrofit2.Call
 import retrofit2.Callback
@@ -11,29 +16,56 @@ import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.error.ApiError
 
 class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
 
-    override val data: LiveData<List<Post>> = postDao.getAll().map { it.map(PostEntity::toDto) }
+    override val data =
+        postDao.getAll().map { it.map(PostEntity::toDto) }.flowOn(Dispatchers.Default)
+
+    override fun updateDao() {
+        postDao.updatePostsFromDao()
+    }
+
 
     override suspend fun getAll() {
         val posts = PostsApi.retrofitService.getAll()
-        if (!posts.isSuccessful) throw Exception("api is error")
-       val body = posts.body() ?: throw Exception("body is null")
+        if (!posts.isSuccessful) {
+            throw ApiError(posts.code(), posts.message())
+        }
+        val body = posts.body() ?: throw ApiError(posts.code(), posts.message())
         //postDao.insert(posts.body()!!.map { PostEntity.fromDto(it) })
         postDao.insert(body.toEntity())
     }
 
+    override fun getNewer(id: Long) = flow {
+        while (true) {
+            delay(10000)
+            val posts = PostsApi.retrofitService.getNewer(id)
+            if (!posts.isSuccessful) {
+                throw ApiError(posts.code(), posts.message())
+            }
+            val body = posts.body() ?: emptyList()
+            emit(body.size)
+            postDao.insert(body.toEntity().map { it.copy(hidden = true) })
+        }
+    }.flowOn(Dispatchers.Default)
+
+
     override suspend fun likeById(post: Post) {
         if (!post.likedByMe) {
-           val posts =  PostsApi.retrofitService.likeById(post.id)
-            if (!posts.isSuccessful) throw Exception("api is error")
-            val body = posts.body() ?: throw Exception("body is null")
+            val posts = PostsApi.retrofitService.likeById(post.id)
+            if (!posts.isSuccessful) {
+                throw ApiError(posts.code(), posts.message())
+            }
+            val body = posts.body() ?: throw ApiError(posts.code(), posts.message())
             postDao.insert(PostEntity.fromDto(body))
-        } else{
+        } else {
             val posts = PostsApi.retrofitService.dislikeById(post.id)
-            if (!posts.isSuccessful) throw Exception("api is error")
-            val body = posts.body() ?: throw Exception("body is null")
+            if (!posts.isSuccessful) {
+                throw ApiError(posts.code(), posts.message())
+            }
+            val body = posts.body() ?: throw ApiError(posts.code(), posts.message())
             postDao.insert(PostEntity.fromDto(body))
         }
     }
@@ -41,8 +73,10 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
     override suspend fun save(post: Post) {
 
         val posts = PostsApi.retrofitService.save(post)
-        if (!posts.isSuccessful) throw Exception("api is error")
-        val body = posts.body() ?: throw Exception("body is null")
+        if (!posts.isSuccessful) {
+            throw ApiError(posts.code(), posts.message())
+        }
+        val body = posts.body() ?: throw ApiError(posts.code(), posts.message())
         postDao.insert(PostEntity.fromDto(body))
 
     }
@@ -50,12 +84,14 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
     override suspend fun removeById(id: Long) {
         val posts = PostsApi.retrofitService.removeById(id)
         if (!posts.isSuccessful) {
-            throw Exception("api is error")
-        } else { postDao.removeById(id)
+            throw ApiError(posts.code(), posts.message())
+        } else {
+            postDao.removeById(id)
             // val body = posts.body() ?: throw Exception("body is null")
             //postDao.insert(PostEntity.fromDto(body))
         }
     }
+
 }
 
 
