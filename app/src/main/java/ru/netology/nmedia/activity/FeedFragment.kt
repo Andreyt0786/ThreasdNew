@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
@@ -28,6 +29,7 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
+        var count = 0
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
@@ -68,6 +70,22 @@ class FeedFragment : Fragment() {
             adapter.submitList(data.posts)
             binding.emptyText.isVisible = data.empty
 
+        }
+
+        viewModel.newer.observe(viewLifecycleOwner) {
+            count = it
+            if (count == 0) {
+                binding.newPostGroup.isVisible = false
+            } else if (count > 0) {
+                binding.newPostGroup.isVisible = true
+            }
+        }
+
+        binding.getNewPost.setOnClickListener {
+            viewModel.updateFromDao()
+            binding.newPostGroup.isVisible = false
+            binding.list.smoothScrollToPosition(viewModel.lastId.toInt())
+            count=0
         }
 
         binding.refreshView.setOnRefreshListener {

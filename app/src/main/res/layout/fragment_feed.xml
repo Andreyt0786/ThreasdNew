@@ -9,7 +9,34 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <TextView
+            android:id="@+id/loadNewPosts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/common_spacing"
+            android:text="@string/get_new_post"
+            app:layout_constraintBottom_toTopOf="@+id/getNewPost"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="packed" />
 
+        <Button
+            android:id="@+id/getNewPost"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/get_new_post"
+            app:layout_constraintBottom_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+           android:layout_marginTop="48dp"
+            app:layout_constraintTop_toBottomOf="@id/loadNewPosts" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/newPostGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:constraint_referenced_ids="getNewPost,loadNewPosts" />
         <TextView
             android:id="@+id/emptyText"
             android:layout_width="wrap_content"

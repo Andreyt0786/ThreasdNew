@@ -13,7 +13,8 @@ data class PostEntity(
     val published: String,
     val likedByMe: Boolean,
     val likes: Int = 0,
-    val authorAvatar:String
+    val authorAvatar:String,
+    val hidden: Boolean =false
 ) {
     fun toDto() = Post(id, author, content, published, likedByMe, likes, authorAvatar)
 
