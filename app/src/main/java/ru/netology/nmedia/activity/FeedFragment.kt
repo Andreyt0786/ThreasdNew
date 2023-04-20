@@ -28,6 +28,7 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
+        var count = 0
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
@@ -68,6 +69,22 @@ class FeedFragment : Fragment() {
             adapter.submitList(data.posts)
             binding.emptyText.isVisible = data.empty
 
+        }
+
+        viewModel.newer.observe(viewLifecycleOwner) {
+            count = it
+            if (count == 0) {
+                binding.newPostGroup.isVisible = false
+            } else if (count > 0) {
+                binding.newPostGroup.isVisible = true
+            }
+        }
+
+        binding.getNewPost.setOnClickListener {
+            viewModel.updateFromDao()
+            binding.newPostGroup.isVisible = false
+            binding.list.smoothScrollToPosition(viewModel.lastId.toInt())
+            count=0
         }
 
         binding.refreshView.setOnRefreshListener {
