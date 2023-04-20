@@ -73,7 +73,6 @@ class FeedFragment : Fragment() {
         }
 
         viewModel.newer.observe(viewLifecycleOwner) {
-            println("new post $it")
             count = it
             if (count == 0) {
                 binding.newPostGroup.isVisible = false
@@ -86,6 +85,7 @@ class FeedFragment : Fragment() {
             viewModel.updateFromDao()
             binding.newPostGroup.isVisible = false
             binding.list.smoothScrollToPosition(viewModel.lastId.toInt())
+            count=0
         }
 
         binding.refreshView.setOnRefreshListener {
