@@ -22,4 +22,7 @@
     <string name="channel_remote_name">Уведомления с сервера</string>
     <string name="channel_remote_description">Уведомления с удалённого сервера</string>
     <string name="get_new_post">Свежие записи</string>
+    <string name="remove">Удалить фото</string>
+    <string name="loaded_photo">Загруженная картнка</string>
+    <string name="go_back">Назад</string>
 </resources>

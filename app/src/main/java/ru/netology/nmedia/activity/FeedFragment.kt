@@ -10,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.PhotoFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -30,6 +32,12 @@ class FeedFragment : Fragment() {
 
         var count = 0
         val adapter = PostsAdapter(object : OnInteractionListener {
+
+            override fun previewPhoto(post: Post) {
+                findNavController().navigate(R.id.action_feedFragment_to_photoFragment,
+                    Bundle().apply { textArg = post.attachment?.url})
+            }
+
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
             }
@@ -66,7 +74,9 @@ class FeedFragment : Fragment() {
         }
 
         viewModel.data.observe(viewLifecycleOwner) { data ->
-            adapter.submitList(data.posts)
+            adapter.submitList(data.posts) {
+                binding.list.smoothScrollToPosition(0)
+            }
             binding.emptyText.isVisible = data.empty
 
         }
@@ -83,8 +93,7 @@ class FeedFragment : Fragment() {
         binding.getNewPost.setOnClickListener {
             viewModel.updateFromDao()
             binding.newPostGroup.isVisible = false
-            binding.list.smoothScrollToPosition(viewModel.lastId.toInt())
-            count=0
+            count = 0
         }
 
         binding.refreshView.setOnRefreshListener {
@@ -94,6 +103,8 @@ class FeedFragment : Fragment() {
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
         }
+
+
 
         return binding.root
     }

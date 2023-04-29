@@ -1,22 +1,22 @@
 package ru.netology.nmedia.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import okhttp3.internal.platform.android.AndroidLogHandler.close
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import ru.netology.nmedia.api.PostsApi
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dto.Attachment
+import ru.netology.nmedia.dto.AttachmentType
+import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
+import java.io.File
 
 class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
 
@@ -25,6 +25,23 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
 
     override fun updateDao() {
         postDao.updatePostsFromDao()
+    }
+
+    override suspend fun saveWithAttachment(file: File, post: Post) {
+        val media = upload(file)
+        val posts = PostsApi.retrofitService.save(post.copy(attachment = Attachment(url=media.id,type = AttachmentType.IMAGE)))
+        if (!posts.isSuccessful) {
+            throw ApiError(posts.code(), posts.message())
+        }
+        val body = posts.body() ?: throw ApiError(posts.code(), posts.message())
+        postDao.insert(PostEntity.fromDto(body))
+
+    }
+
+    private suspend fun upload(file: File): Media {
+        return PostsApi.retrofitService.upload(
+            MultipartBody.Part.createFormData("file", file.name, file.asRequestBody()))
+                .let { requireNotNull(it.body())}
     }
 
 

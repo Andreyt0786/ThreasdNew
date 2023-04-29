@@ -10,6 +10,7 @@ import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.FeedPosts
+import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.repository.*
 import ru.netology.nmedia.util.SingleLiveEvent
 
@@ -20,7 +21,8 @@ private val empty = Post(
     likedByMe = false,
     likes = 0,
     published = "",
-    authorAvatar = ""
+    authorAvatar = "",
+    attachment = null
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -33,6 +35,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     val data: LiveData<FeedPosts> =
         repository.data.map { FeedPosts(posts = it, empty = it.isEmpty()) }
             .asLiveData(Dispatchers.Default)
+
+    private val _photoState = MutableLiveData<PhotoModel?>()
+    val photoState: LiveData<PhotoModel?>
+        get() = _photoState
+
     val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
     val postCreated: LiveData<Unit>
@@ -83,6 +90,9 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun changePhoto(photoModel: PhotoModel?) {
+        _photoState.value = photoModel
+    }
     /*thread {
         // Начинаем загрузку
         _state.postValue(FeedModelState(loading = true))
@@ -98,17 +108,20 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun save() {
-        edited.value?.let {
+        edited.value?.let { post ->
             _postCreated.value = Unit
             viewModelScope.launch {
                 try {
-                    repository.save(it)
+                    _photoState.value?.let { photoModel ->
+                        repository.saveWithAttachment(photoModel.file, post)
+                    } ?: repository.save(post)
                     _state.value = FeedModelState()
                 } catch (e: Exception) {
                     _state.value = FeedModelState(error = true)
                 }
 
             }
+            _photoState.value=null
             edited.value = empty
         }
     }
