@@ -14,6 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.*
 import ru.netology.nmedia.dto.Media
+import ru.netology.nmedia.model.IdenticModel
 
 
 private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
@@ -41,6 +42,10 @@ interface PostApiService {
     @Multipart
     @POST("media")
     suspend fun upload(@Part part: MultipartBody.Part): Response<Media>
+
+    @FormUrlEncoded
+    @POST("users/authentication")
+    suspend fun updateUser(@Field("login") login: String?, @Field("pass") pass: String?):Response <String>
 }
 
 

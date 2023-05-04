@@ -25,4 +25,10 @@
     <string name="remove">Удалить фото</string>
     <string name="loaded_photo">Загруженная картнка</string>
     <string name="go_back">Назад</string>
+    <string name="singOut">Выйти из уч.записи</string>
+    <string name="singIn">Авторизироваться</string>
+    <string name="singUp">Зарегистрироваться</string>
+    <string name="authorise">Введите ваш логин</string>
+    <string name="passWord">Введите ваш пароль</string>
+    <string name="enter">Вход</string>
 </resources>

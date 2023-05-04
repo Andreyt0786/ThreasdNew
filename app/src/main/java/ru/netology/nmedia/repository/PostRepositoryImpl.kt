@@ -1,5 +1,6 @@
 package ru.netology.nmedia.repository
 
+import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
@@ -16,6 +17,8 @@ import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
+import ru.netology.nmedia.model.AuthModel
+import ru.netology.nmedia.viewmodel.IdenticViewModel
 import java.io.File
 
 class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
@@ -23,13 +26,26 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
     override val data =
         postDao.getAll().map { it.map(PostEntity::toDto) }.flowOn(Dispatchers.Default)
 
-    override fun updateDao() {
+    override suspend fun updateDao() {
         postDao.updatePostsFromDao()
+    }
+
+    override suspend fun getToken(login: String?, password: String?): AuthModel {
+        val gson = Gson()
+        val response = PostsApi.retrofitService.updateUser(login = login, pass = password)
+        return gson.fromJson(response, AuthModel::class.java)
     }
 
     override suspend fun saveWithAttachment(file: File, post: Post) {
         val media = upload(file)
-        val posts = PostsApi.retrofitService.save(post.copy(attachment = Attachment(url=media.id,type = AttachmentType.IMAGE)))
+        val posts = PostsApi.retrofitService.save(
+            post.copy(
+                attachment = Attachment(
+                    url = media.id,
+                    type = AttachmentType.IMAGE
+                )
+            )
+        )
         if (!posts.isSuccessful) {
             throw ApiError(posts.code(), posts.message())
         }
@@ -40,8 +56,9 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
 
     private suspend fun upload(file: File): Media {
         return PostsApi.retrofitService.upload(
-            MultipartBody.Part.createFormData("file", file.name, file.asRequestBody()))
-                .let { requireNotNull(it.body())}
+            MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
+        )
+            .let { requireNotNull(it.body()) }
     }
 
 

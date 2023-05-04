@@ -19,7 +19,7 @@ interface OnInteractionListener {
     fun onEdit(post: Post) {}
     fun onRemove(post: Post) {}
     fun onShare(post: Post) {}
-    fun previewPhoto(post:Post){}
+    fun previewPhoto(post: Post) {}
 }
 
 class PostsAdapter(
@@ -75,6 +75,7 @@ class PostViewHolder(
 
 
 
+            menu.isVisible = post.ownedByMe
 
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {
@@ -96,7 +97,7 @@ class PostViewHolder(
                 }.show()
             }
 
-            imageHolder.setOnClickListener{
+            imageHolder.setOnClickListener {
                 onInteractionListener.previewPhoto(post)
             }
 

@@ -24,4 +24,10 @@
     <string name="remove">Remove photo</string>
     <string name="loaded_photo">Loaded photo</string>
     <string name="go_back">Back</string>
+    <string name="singOut">singOut</string>
+    <string name="singIn">singIn</string>
+    <string name="singUp">singUp</string>
+    <string name="authorise">Enter your login</string>
+    <string name="passWord">Enter your password</string>
+    <string name="enter">Enter</string>
 </resources>

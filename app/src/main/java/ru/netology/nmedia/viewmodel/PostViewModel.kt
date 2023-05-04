@@ -4,10 +4,13 @@ import android.app.Application
 import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.FeedPosts
 import ru.netology.nmedia.model.PhotoModel
@@ -22,7 +25,8 @@ private val empty = Post(
     likes = 0,
     published = "",
     authorAvatar = "",
-    attachment = null
+    attachment = null,
+    authorId = 0,
 )
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
@@ -32,9 +36,15 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     private val _state = MutableLiveData(FeedModelState())
     val state: LiveData<FeedModelState>
         get() = _state
-    val data: LiveData<FeedPosts> =
-        repository.data.map { FeedPosts(posts = it, empty = it.isEmpty()) }
-            .asLiveData(Dispatchers.Default)
+    val data: LiveData<FeedPosts> = AppAuth.getInstance().authStateFlow.flatMapLatest { (id, _) ->
+        repository.data
+            .map { posts ->
+                FeedPosts(
+                    posts.map { it.copy(ownedByMe = it.authorId == id) },
+                    posts.isEmpty()
+                )
+            }
+    }.asLiveData(Dispatchers.Default)
 
     private val _photoState = MutableLiveData<PhotoModel?>()
     val photoState: LiveData<PhotoModel?>
@@ -59,15 +69,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateFromDao() = viewModelScope.launch {
         repository.updateDao()
-        /*  delay(2000)
-          repository.getAll()
-          delay(500)
-          val new: LiveData<Int> = data.switchMap {
-              lastId = it.posts.lastOrNull()?.id ?: 0L
-              repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
-                  .catch { e -> e.printStackTrace() }
-                  .asLiveData(Dispatchers.Default)
-          }*/
+
     }
 
     fun loadPosts() = viewModelScope.launch {
@@ -121,7 +123,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
             }
-            _photoState.value=null
+            _photoState.value = null
             edited.value = empty
         }
     }
