@@ -8,6 +8,6 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         AppAuth.initAppAuth(applicationContext)
-        Identic.initAppAuth(applicationContext)
+
     }
 }

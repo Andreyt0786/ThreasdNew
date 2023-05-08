@@ -2,6 +2,7 @@ package ru.netology.nmedia.repository
 
 import androidx.lifecycle.LiveData
 import kotlinx.coroutines.flow.Flow
+import retrofit2.Response
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.viewmodel.IdenticViewModel
@@ -16,7 +17,7 @@ interface PostRepository {
     fun getNewer(id:Long): Flow<Int>
     suspend fun updateDao()
     suspend fun saveWithAttachment(file:File, post:Post)
-    suspend fun getToken(login:String?, password:String?):AuthModel
+    suspend fun getToken(login:String?, password:String?): AuthModel
 
 
 }

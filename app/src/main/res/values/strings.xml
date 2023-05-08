@@ -30,4 +30,10 @@
     <string name="authorise">Enter your login</string>
     <string name="passWord">Enter your password</string>
     <string name="enter">Enter</string>
+    <string name="APIerror">Api error. Try one more time</string>
+    <string name="error"> Error. Try one more time</string>
+    <string name="Authorization"> Authorixation completed</string>
+    <string name="goOut">Are you sure to sing out?</string>
+    <string name="exit">exit</string>
+    <string name="stand">No</string>
 </resources>

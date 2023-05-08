@@ -12,7 +12,7 @@ data class Post(
     val likes: Int = 0,
     val authorAvatar:String,
     val attachment : Attachment?,
-    val ownedByMe: Boolean = false
+    val ownedByMe: Boolean = false,
 ) {
 
 }

@@ -50,7 +50,11 @@ class FeedFragment : Fragment() {
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeById(post)
+                if (authViewModel.isAuthorized) {
+                    viewModel.likeById(post)
+                } else {
+                    findNavController().navigate(R.id.action_feedFragment_to_authFragment)
+                }
             }
 
             override fun onRemove(post: Post) {
@@ -95,12 +99,7 @@ class FeedFragment : Fragment() {
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     return when (menuItem.itemId) {
                         R.id.singIn -> {
-                            findNavController().navigate(R.id.action_authFragment_to_feedFragment)
-                            identicViewModel.identicLiveData.observe(viewLifecycleOwner) { identicModel ->
-                                identicViewModel.getIdToken()
-
-                                AppAuth.getInstance().setUser(AuthModel(5, "x-token"))
-                            }
+                            findNavController().navigate(R.id.action_feedFragment_to_authFragment)
                             true
                         }
                         R.id.singUp -> {
@@ -108,18 +107,17 @@ class FeedFragment : Fragment() {
                             true
                         }
                         R.id.singOut -> {
-                            Identic.getInstance().removeUser()
-                            AppAuth.getInstance().removeUser()
-
+                            findNavController().navigate(R.id.action_feedFragment_to_signOutFragment)
                             true
                         }
                         else -> false
                     }
                 }
-            }.also { currentMenuProvider=it }, viewLifecycleOwner)
+            }.also { currentMenuProvider = it }, viewLifecycleOwner)
         }
 
-        viewModel.data.observe(viewLifecycleOwner) { data ->
+        viewModel.data.observe(viewLifecycleOwner)
+        { data ->
             adapter.submitList(data.posts) {
                 binding.list.smoothScrollToPosition(0)
             }
@@ -127,7 +125,8 @@ class FeedFragment : Fragment() {
 
         }
 
-        viewModel.newer.observe(viewLifecycleOwner) {
+        viewModel.newer.observe(viewLifecycleOwner)
+        {
             count = it
             if (count == 0) {
                 binding.newPostGroup.isVisible = false
@@ -147,10 +146,13 @@ class FeedFragment : Fragment() {
         }
 
         binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            if (authViewModel.isAuthorized) {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            } else {
+                findNavController().navigate(R.id.action_feedFragment_to_authFragment)
+            }
+
         }
-
-
 
         return binding.root
     }

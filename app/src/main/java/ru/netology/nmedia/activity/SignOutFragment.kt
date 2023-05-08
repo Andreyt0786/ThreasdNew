@@ -20,6 +20,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentAuthBinding
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
+import ru.netology.nmedia.databinding.FragmentSingOutBinding
 import ru.netology.nmedia.identic.Identic
 import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.model.IdenticModel
@@ -30,7 +31,7 @@ import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.IdenticViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-class AuthFragment : Fragment() {
+class SignOutFragment : Fragment() {
 
     private val identicViewModel: IdenticViewModel by viewModels()
 
@@ -39,7 +40,7 @@ class AuthFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val binding = FragmentAuthBinding.inflate(
+        val binding = FragmentSingOutBinding.inflate(
             inflater,
             container,
             false
@@ -50,37 +51,18 @@ class AuthFragment : Fragment() {
 
 
 
-        binding.enter.setOnClickListener {
-                identicViewModel.getIdToken(binding.login.text.toString().trim(), binding.pass.text.toString().trim())
-            }
 
-
-
-        identicViewModel.tokenServer.observe(viewLifecycleOwner) { state ->
-            binding.authGroup.isVisible = state.complete
-            binding.newPostGroup.isVisible = state.firstView
-            binding.apiErrorGroup.isVisible = state.errorApi
-            binding.errorException.isVisible = state.error
+        binding.No.setOnClickListener {
+            findNavController().navigate(R.id.action_signOutFragment_to_feedFragment)
         }
 
-        binding.complete.setOnClickListener {
-            findNavController().navigate(R.id.action_authFragment_to_feedFragment)
+        binding.Yes.setOnClickListener {
+            AppAuth.getInstance().removeUser()
+            findNavController().navigate(R.id.action_signOutFragment_to_feedFragment)
         }
 
 
-        binding.errorButtom.setOnClickListener {
-            binding.authGroup.isVisible = false
-            binding.newPostGroup.isVisible = true
-            binding.apiErrorGroup.isVisible = false
-            binding.errorException.isVisible = false
-        }
 
-        binding.apiErrorButtom.setOnClickListener {
-            binding.authGroup.isVisible = false
-            binding.newPostGroup.isVisible = true
-            binding.apiErrorGroup.isVisible = false
-            binding.errorException.isVisible = false
-        }
       
         return binding.root
     }

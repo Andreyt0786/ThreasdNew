@@ -6,59 +6,156 @@
     android:layout_height="match_parent"
     tools:context=".activity.AuthFragment">
 
-
     <LinearLayout
+        android:id="@+id/newPostGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
+    <TextView
+        android:id="@+id/auth_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/common_spacing"
+        android:text="@string/authorise"
+        android:layout_gravity="center_horizontal"
+         />
 
-        <TextView
-            android:id="@+id/auth_login"
+    <EditText
+        android:id="@+id/login"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/back"
+        android:inputType="text"
+        android:layout_gravity="center_horizontal"
+     />
+
+    <TextView
+        android:id="@+id/auth_pass"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/common_spacing"
+        android:text="@string/passWord"
+        />
+
+    <EditText
+        android:id="@+id/pass"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="64dp"
+        android:background="@drawable/back"
+        android:inputType="text"
+        android:layout_gravity="center_horizontal" />
+
+    <Button
+        android:id="@+id/enter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="@string/enter"
+        android:layout_gravity="bottom|center_horizontal" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/api_error_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+
+    <TextView
+        android:id="@+id/api_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingTop="@dimen/common_spacing"
+        android:text="@string/APIerror"
+        />
+        <Button
+            android:id="@+id/api_error_buttom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="@dimen/common_spacing"
-            android:paddingBottom="@dimen/common_spacing"
-            android:text="@string/authorise"
+            android:layout_marginTop="32dp"
+            android:text="@string/retry_loading"
             android:layout_gravity="center_horizontal"
             />
-        <EditText
-            android:id="@+id/login"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="32dp"
-            android:background="@drawable/back"
-            android:layout_gravity="center_horizontal"
-            android:inputType="textMultiLine" />
 
-        <TextView
-            android:id="@+id/auth_pass"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/common_spacing"
-            android:text="@string/passWord"
-            android:layout_gravity="center_horizontal"
-            />
-        <EditText
-            android:id="@+id/pass"
-            android:layout_width="150dp"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="16dp"
-            android:layout_gravity="center_horizontal"
-            android:inputType="textMultiLine"
-            android:background="@drawable/back"/>
-
-            <Button
-                android:id="@+id/enter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|center_horizontal"
-                android:text="@string/enter" />
 
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/error_exception"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    <TextView
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/common_spacing"
+        android:text="@string/error"
+        />
+
+        <Button
+            android:id="@+id/error_buttom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/retry_loading"
+            android:layout_gravity="center_horizontal"
+            />
+
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/auth_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:visibility="gone"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+
+
+    <TextView
+        android:id="@+id/text_auth"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/common_spacing"
+        android:text="@string/Authorization"
+        />
+
+        <Button
+            android:id="@+id/complete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/enter"
+            android:layout_gravity="center_horizontal"
+            />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

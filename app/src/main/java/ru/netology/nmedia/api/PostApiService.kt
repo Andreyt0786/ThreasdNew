@@ -14,6 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.*
 import ru.netology.nmedia.dto.Media
+import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.model.IdenticModel
 
 
@@ -45,7 +46,7 @@ interface PostApiService {
 
     @FormUrlEncoded
     @POST("users/authentication")
-    suspend fun updateUser(@Field("login") login: String?, @Field("pass") pass: String?):Response <String>
+    suspend fun updateUser(@Field("login") login: String?, @Field("pass") pass: String?):Response <AuthModel>
 }
 
 

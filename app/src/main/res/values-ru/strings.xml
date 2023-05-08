@@ -31,4 +31,10 @@
     <string name="authorise">Введите ваш логин</string>
     <string name="passWord">Введите ваш пароль</string>
     <string name="enter">Вход</string>
+    <string name="APIerror"> Ошибка Api. Авторизируйтесь еще раз</string>
+    <string name="error"> Ошибка. Попробуйте еще раз</string>
+    <string name="Authorization"> Авторизация успешна</string>
+    <string name="goOut">Вы уверены что хотите выйти?</string>
+    <string name="exit">выйти</string>
+    <string name="stand">остаться</string>
 </resources>

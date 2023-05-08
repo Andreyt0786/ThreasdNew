@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import retrofit2.Response
 import ru.netology.nmedia.api.PostsApi
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Attachment
@@ -31,9 +32,12 @@ class PostRepositoryImpl(private val postDao: PostDao) : PostRepository {
     }
 
     override suspend fun getToken(login: String?, password: String?): AuthModel {
-        val gson = Gson()
-        val response = PostsApi.retrofitService.updateUser(login = login, pass = password)
-        return gson.fromJson(response, AuthModel::class.java)
+        val response = PostsApi.retrofitService.updateUser(login,password)
+
+            if(!response.isSuccessful){
+                throw ApiError(response.code(),response.message())
+            }
+        return response.body()?:throw ApiError(response.code(), response.message())
     }
 
     override suspend fun saveWithAttachment(file: File, post: Post) {
