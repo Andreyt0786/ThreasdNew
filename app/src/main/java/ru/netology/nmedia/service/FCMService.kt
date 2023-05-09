@@ -1,10 +1,12 @@
 package ru.netology.nmedia.service
 
 import android.Manifest
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.PermissionChecker
@@ -38,10 +40,34 @@ class FCMService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
 
-        message.data[action]?.let {
-           when (Action.valueOf(it)) {
-              Action.LIKE -> handleLike(gson.fromJson(message.data[content], Like::class.java))
-           }
+        Log.d("TAG","OnMessageReceived: ${message.data[content]}")
+        val value = gson.fromJson(message.data[content], Notific::class.java)
+        if( value.recipientId == null || value.recipientId == AppAuth.getInstance().authStateFlow.value.id){
+            val str=value.content
+            println(str)}
+        if (value.recipientId != 0L && value.recipientId != AppAuth.getInstance().authStateFlow.value.id && value.recipientId != null) {
+            AppAuth.getInstance().uploadPushToken()
+        } else if (value.recipientId == 0L && value.recipientId != AppAuth.getInstance().authStateFlow.value.id && value.recipientId != null) {
+            AppAuth.getInstance().uploadPushToken()
+        }
+
+        try {
+            message.data[action]?.let {
+
+                when (Action.valueOf(it)) {
+                    Action.LIKE ->
+                        handleLike(gson.fromJson(message.data[content], Like::class.java))
+
+                    Action.TEXT ->
+                        handleText(gson.fromJson(message.data[content], hanText::class.java))
+
+
+                }
+            }
+        } catch (e: Throwable) {
+            //error()
+            //можно выдавать ошибку об обновлении
+            return
         }
     }
 
@@ -71,10 +97,44 @@ class FCMService : FirebaseMessagingService() {
                 .notify(Random.nextInt(100_000), notification)
         }
     }
+
+    private fun handleText(content: hanText) {
+        var notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(content.title)
+            .setContentText(content.minText)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(content.contentText)
+            )
+            .setDefaults(Notification.DEFAULT_SOUND)
+            .build()
+
+        NotificationManagerCompat.from(this)
+            .notify(Random.nextInt(100_000), notification)
+
+    }
+
+    private fun error() {
+        var notification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(getString(R.string.title_error))
+            .setContentText(getString(R.string.content_text_error))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(getString(R.string.catch_error))
+            )
+            .setDefaults(Notification.DEFAULT_SOUND)
+            .setAutoCancel(true)
+            .build()
+
+        NotificationManagerCompat.from(this)
+            .notify(Random.nextInt(100_000), notification)
+    }
 }
 
 enum class Action {
-    LIKE,
+    LIKE, TEXT,
 }
 
 data class Like(
@@ -84,3 +144,15 @@ data class Like(
     val postAuthor: String,
 )
 
+
+data class hanText(
+    val authorName: String,
+    val title: String,
+    val contentText: String,
+    val minText: String
+)
+
+data class Notific(
+    val recipientId: Long?,
+    val content: String,
+)

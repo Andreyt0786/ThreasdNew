@@ -36,4 +36,7 @@
     <string name="goOut">Are you sure to sing out?</string>
     <string name="exit">exit</string>
     <string name="stand">No</string>
+    <string name="catch_error">Please update your app to receive new type of message</string>
+    <string name="title_error">Error update</string>
+    <string name="content_text_error">Please update your app</string>
 </resources>
