@@ -23,6 +23,8 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@sample/posts.json/data/authorAvatar" />
 
+
+
         <TextView
             android:id="@+id/author"
             android:layout_width="0dp"
@@ -83,12 +85,22 @@
             app:layout_constraintTop_toBottomOf="@id/header"
             tools:text="@sample/posts.json/data/content" />
 
+        <ImageView
+            android:id="@+id/image_holder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/loaded_photo"
+            android:layout_marginBottom="@dimen/common_spacing"
+            app:layout_constraintTop_toBottomOf="@id/content"
+            android:visibility="gone"
+            tools:srcCompat="@sample/posts.json/data/authorAvatar" />
+
         <androidx.constraintlayout.widget.Barrier
             android:id="@+id/footer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:barrierDirection="bottom"
-            app:constraint_referenced_ids="content" />
+            app:constraint_referenced_ids="image_holder" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/like"
