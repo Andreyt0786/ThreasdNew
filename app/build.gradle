@@ -69,6 +69,7 @@ dependencies {
     def coroutines_version = "1.6.4"
     def imagepicker_version = "2.1"
 
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "androidx.core:core-ktx:$core_version"
     implementation "androidx.appcompat:appcompat:$appcompat_version"
@@ -98,6 +99,8 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swiperefreshlayout_version"
     implementation "com.github.dhaval2404:imagepicker:$imagepicker_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
+    
 
 
     testImplementation "junit:junit:$junit_version"

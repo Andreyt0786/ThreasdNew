@@ -45,14 +45,16 @@ class AuthFragment : Fragment() {
             false
         )
 
-      //  val login = binding.login.text.toString()
-       // val pass = binding.pass.text.toString()
-
+        //  val login = binding.login.text.toString()
+        // val pass = binding.pass.text.toString()
 
 
         binding.enter.setOnClickListener {
-                identicViewModel.getIdToken(binding.login.text.toString().trim(), binding.pass.text.toString().trim())
-            }
+            identicViewModel.getIdToken(
+                binding.login.text.toString().trim(),
+                binding.pass.text.toString().trim()
+            )
+        }
 
 
 
@@ -81,7 +83,7 @@ class AuthFragment : Fragment() {
             binding.apiErrorGroup.isVisible = false
             binding.errorException.isVisible = false
         }
-      
+
         return binding.root
     }
 }

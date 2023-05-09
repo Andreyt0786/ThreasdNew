@@ -1,26 +1,25 @@
 package ru.netology.nmedia.api
 
 import okhttp3.MultipartBody
-import retrofit2.Call
 import retrofit2.http.GET
 import ru.netology.nmedia.BuildConfig
 import ru.netology.nmedia.dto.Post
 import okhttp3.OkHttpClient
-import okhttp3.RequestBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
 import retrofit2.http.*
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.dto.Media
+import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.model.AuthModel
-import ru.netology.nmedia.model.IdenticModel
 
 
 private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
 
-interface PostApiService {
+interface ApiService {
 
     @GET("posts")
     suspend fun getAll(): Response<List<Post>>
@@ -47,6 +46,9 @@ interface PostApiService {
     @FormUrlEncoded
     @POST("users/authentication")
     suspend fun updateUser(@Field("login") login: String?, @Field("pass") pass: String?):Response <AuthModel>
+
+    @POST("users/push-tokens")
+    suspend fun uploadPushToken (@Body pushToken: PushToken): Response <Unit>
 }
 
 
@@ -58,6 +60,19 @@ private val logging = HttpLoggingInterceptor().apply {
 
 private val okhttp = OkHttpClient.Builder()
     .addInterceptor(logging)
+    .addInterceptor { chain ->
+        val token = AppAuth.getInstance().authStateFlow.value.token
+        val request = if (token != null) {
+            chain.request()
+                .newBuilder()
+                .addHeader("Authorization", token)
+                .build()
+        } else {
+            chain.request()
+        }
+
+        chain.proceed(request)
+    }
     .build()
 
 private val retrofit = Retrofit.Builder()
@@ -66,8 +81,8 @@ private val retrofit = Retrofit.Builder()
     .client(okhttp)
     .build()
 
-object PostsApi {
-    val retrofitService: PostApiService by lazy {
+object Api {
+    val retrofitService: ApiService by lazy {
         retrofit.create()
     }
 }
