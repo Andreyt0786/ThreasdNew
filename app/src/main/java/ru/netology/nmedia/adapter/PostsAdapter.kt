@@ -44,14 +44,14 @@ class PostViewHolder(
 
 
     fun bind(post: Post) {
-        val url = "http://192.168.0.18:9090/avatars/${post.authorAvatar}"
+        val url = "http://192.168.31.54:9090/avatars/${post.authorAvatar}"
         Glide.with(binding.avatar)
             .load(url)
             .timeout(10000)
             .circleCrop()
             .into(binding.avatar)
 
-        val urlImage = "http://192.168.0.18:9090/media/${post.attachment?.url}"
+        val urlImage = "http://192.168.31.54:9090/media/${post.attachment?.url}"
 
         if (urlImage == null) {
             binding.imageHolder.isVisible = false

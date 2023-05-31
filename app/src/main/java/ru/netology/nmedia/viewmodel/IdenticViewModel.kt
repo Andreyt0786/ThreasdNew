@@ -3,6 +3,7 @@ package ru.netology.nmedia.viewmodel
 import android.app.Application
 import androidx.lifecycle.*
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
@@ -17,12 +18,13 @@ import ru.netology.nmedia.model.IdenticModel
 import ru.netology.nmedia.repository.PostRepository
 import ru.netology.nmedia.repository.PostRepositoryImpl
 import ru.netology.nmedia.util.SingleLiveEvent
+import javax.inject.Inject
 
-class IdenticViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository: PostRepository =
-        PostRepositoryImpl(AppDb.getInstance(context = application).postDao())
-
+@HiltViewModel
+class IdenticViewModel @Inject constructor(
+    private val repository: PostRepository,
+    private val appAuth: AppAuth
+) : ViewModel() {
 
     private val _tokenServer = SingleLiveEvent<AuthModelState>()
     val tokenServer: LiveData<AuthModelState>
@@ -34,7 +36,7 @@ class IdenticViewModel(application: Application) : AndroidViewModel(application)
             try {
                 val response = repository.getToken(login, password)
                 response.token?.let {
-                    AppAuth.getInstance().setUser(AuthModel(response.id, response.token))
+                    appAuth.setUser(AuthModel(response.id, response.token))
                     _tokenServer.value = AuthModelState(firstView = false, complete = true)
                 }
             } catch (e: ApiError) {

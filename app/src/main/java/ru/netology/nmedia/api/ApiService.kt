@@ -17,7 +17,7 @@ import ru.netology.nmedia.dto.PushToken
 import ru.netology.nmedia.model.AuthModel
 
 
-private const val BASE_URL = "${BuildConfig.BASE_URL}/api/slow/"
+
 
 interface ApiService {
 
@@ -52,37 +52,4 @@ interface ApiService {
 }
 
 
-private val logging = HttpLoggingInterceptor().apply {
-    if (BuildConfig.DEBUG) {
-        level = HttpLoggingInterceptor.Level.BODY
-    }
-}
 
-private val okhttp = OkHttpClient.Builder()
-    .addInterceptor(logging)
-    .addInterceptor { chain ->
-        val token = AppAuth.getInstance().authStateFlow.value.token
-        val request = if (token != null) {
-            chain.request()
-                .newBuilder()
-                .addHeader("Authorization", token)
-                .build()
-        } else {
-            chain.request()
-        }
-
-        chain.proceed(request)
-    }
-    .build()
-
-private val retrofit = Retrofit.Builder()
-    .addConverterFactory(GsonConverterFactory.create())
-    .baseUrl(BASE_URL)
-    .client(okhttp)
-    .build()
-
-object Api {
-    val retrofitService: ApiService by lazy {
-        retrofit.create()
-    }
-}

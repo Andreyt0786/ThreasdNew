@@ -10,7 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.delay
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.PhotoFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
@@ -18,17 +18,22 @@ import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.identic.Identic
 import ru.netology.nmedia.model.AuthModel
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.IdenticViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
+
+    @Inject
+    lateinit var appAuth:AppAuth
 
     private val viewModel: PostViewModel by activityViewModels()
     private val authViewModel: AuthViewModel by viewModels()
     private val identicViewModel: IdenticViewModel by viewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,7 +91,7 @@ class FeedFragment : Fragment() {
 
         var currentMenuProvider: MenuProvider? = null
 
-        authViewModel.authLiveData.observe(viewLifecycleOwner) { authModel ->
+        authViewModel.authLiveData.observe(viewLifecycleOwner) { //authModel -> почему то подсвечивает
 
             currentMenuProvider?.let(requireActivity()::removeMenuProvider)
             requireActivity().addMenuProvider(object : MenuProvider {
@@ -103,7 +108,7 @@ class FeedFragment : Fragment() {
                             true
                         }
                         R.id.singUp -> {
-                            AppAuth.getInstance().setUser(AuthModel(5, "x-token"))
+                            appAuth.setUser(AuthModel(5, "x-token"))
                             true
                         }
                         R.id.singOut -> {

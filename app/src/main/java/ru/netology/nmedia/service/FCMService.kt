@@ -13,16 +13,21 @@ import androidx.core.content.PermissionChecker
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
+import javax.inject.Inject
 import kotlin.random.Random
 
-
+@AndroidEntryPoint
 class FCMService : FirebaseMessagingService() {
     private val action = "action"
     private val content = "content"
     private val channelId = "remote"
     private val gson = Gson()
+
+    @Inject
+    lateinit var appAuth:AppAuth
 
     override fun onCreate() {
         super.onCreate()
@@ -42,13 +47,13 @@ class FCMService : FirebaseMessagingService() {
 
         Log.d("TAG","OnMessageReceived: ${message.data[content]}")
         val value = gson.fromJson(message.data[content], Notific::class.java)
-        if( value.recipientId == null || value.recipientId == AppAuth.getInstance().authStateFlow.value.id){
+        if( value.recipientId == null || value.recipientId ==appAuth.authStateFlow.value.id){
             val str=value.content
             println(str)}
-        if (value.recipientId != 0L && value.recipientId != AppAuth.getInstance().authStateFlow.value.id && value.recipientId != null) {
-            AppAuth.getInstance().uploadPushToken()
-        } else if (value.recipientId == 0L && value.recipientId != AppAuth.getInstance().authStateFlow.value.id && value.recipientId != null) {
-            AppAuth.getInstance().uploadPushToken()
+        if (value.recipientId != 0L && value.recipientId !=appAuth.authStateFlow.value.id && value.recipientId != null) {
+            appAuth.uploadPushToken()
+        } else if (value.recipientId == 0L && value.recipientId !=appAuth.authStateFlow.value.id && value.recipientId != null) {
+           appAuth.uploadPushToken()
         }
 
         try {
@@ -72,7 +77,7 @@ class FCMService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        AppAuth.getInstance().uploadPushToken(token)
+      appAuth.uploadPushToken(token)
     }
 
     private fun handleLike(content: Like) {
