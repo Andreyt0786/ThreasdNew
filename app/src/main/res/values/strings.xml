@@ -20,4 +20,23 @@
     <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
     <string name="channel_remote_name">Server notifications</string>
     <string name="channel_remote_description">Notifications from remote server</string>
+    <string name="get_new_post">Click to get new posts</string>
+    <string name="remove">Remove photo</string>
+    <string name="loaded_photo">Loaded photo</string>
+    <string name="go_back">Back</string>
+    <string name="singOut">singOut</string>
+    <string name="singIn">singIn</string>
+    <string name="singUp">singUp</string>
+    <string name="authorise">Enter your login</string>
+    <string name="passWord">Enter your password</string>
+    <string name="enter">Enter</string>
+    <string name="APIerror">Api error. Try one more time</string>
+    <string name="error"> Error. Try one more time</string>
+    <string name="Authorization"> Authorixation completed</string>
+    <string name="goOut">Are you sure to sing out?</string>
+    <string name="exit">exit</string>
+    <string name="stand">No</string>
+    <string name="catch_error">Please update your app to receive new type of message</string>
+    <string name="title_error">Error update</string>
+    <string name="content_text_error">Please update your app</string>
 </resources>

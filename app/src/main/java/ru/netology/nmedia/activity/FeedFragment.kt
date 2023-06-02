@@ -2,24 +2,38 @@ package ru.netology.nmedia.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
+import ru.netology.nmedia.activity.PhotoFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
+import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.AuthModel
+import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.IdenticViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FeedFragment : Fragment() {
 
+    @Inject
+    lateinit var appAuth:AppAuth
+
     private val viewModel: PostViewModel by activityViewModels()
+    private val authViewModel: AuthViewModel by viewModels()
+    private val identicViewModel: IdenticViewModel by viewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,13 +42,24 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(inflater, container, false)
 
+        var count = 0
         val adapter = PostsAdapter(object : OnInteractionListener {
+
+            override fun previewPhoto(post: Post) {
+                findNavController().navigate(R.id.action_feedFragment_to_photoFragment,
+                    Bundle().apply { textArg = post.attachment?.url })
+            }
+
             override fun onEdit(post: Post) {
                 viewModel.edit(post)
             }
 
             override fun onLike(post: Post) {
-                viewModel.likeById(post)
+                if (authViewModel.isAuthorized) {
+                    viewModel.likeById(post)
+                } else {
+                    findNavController().navigate(R.id.action_feedFragment_to_authFragment)
+                }
             }
 
             override fun onRemove(post: Post) {
@@ -64,10 +89,61 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.data.observe(viewLifecycleOwner) { data ->
-            adapter.submitList(data.posts)
+        var currentMenuProvider: MenuProvider? = null
+
+        authViewModel.authLiveData.observe(viewLifecycleOwner) { //authModel -> почему то подсвечивает
+
+            currentMenuProvider?.let(requireActivity()::removeMenuProvider)
+            requireActivity().addMenuProvider(object : MenuProvider {
+                override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                    menuInflater.inflate(R.menu.auth_menu, menu)
+                    menu.setGroupVisible(R.id.authorized, authViewModel.isAuthorized)
+                    menu.setGroupVisible(R.id.unAuthorized, !authViewModel.isAuthorized)
+                }
+
+                override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                    return when (menuItem.itemId) {
+                        R.id.singIn -> {
+                            findNavController().navigate(R.id.action_feedFragment_to_authFragment)
+                            true
+                        }
+                        R.id.singUp -> {
+                            appAuth.setUser(AuthModel(5, "x-token"))
+                            true
+                        }
+                        R.id.singOut -> {
+                            findNavController().navigate(R.id.action_feedFragment_to_signOutFragment)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+            }.also { currentMenuProvider = it }, viewLifecycleOwner)
+        }
+
+        viewModel.data.observe(viewLifecycleOwner)
+        { data ->
+            adapter.submitList(data.posts) {
+                binding.list.smoothScrollToPosition(0)
+            }
             binding.emptyText.isVisible = data.empty
 
+        }
+
+        viewModel.newer.observe(viewLifecycleOwner)
+        {
+            count = it
+            if (count == 0) {
+                binding.newPostGroup.isVisible = false
+            } else if (count > 0) {
+                binding.newPostGroup.isVisible = true
+            }
+        }
+
+        binding.getNewPost.setOnClickListener {
+            viewModel.updateFromDao()
+            binding.newPostGroup.isVisible = false
+            count = 0
         }
 
         binding.refreshView.setOnRefreshListener {
@@ -75,7 +151,12 @@ class FeedFragment : Fragment() {
         }
 
         binding.fab.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            if (authViewModel.isAuthorized) {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            } else {
+                findNavController().navigate(R.id.action_feedFragment_to_authFragment)
+            }
+
         }
 
         return binding.root
