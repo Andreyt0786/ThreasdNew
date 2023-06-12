@@ -30,13 +30,14 @@ class PostRepositoryImpl @Inject constructor(
 ) : PostRepository {
 
     override val data = Pager(
-        config= PagingConfig(pageSize = 10, enablePlaceholders = false),
+        config = PagingConfig(pageSize = 10, enablePlaceholders = false),
         pagingSourceFactory = {
-                PostPagingSource(
-                    apiService
-        )}
+            PostPagingSource(
+                apiService
+            )
+        }
     ).flow
-        //postDao.getAll().map { it.map(PostEntity::toDto) }.flowOn(Dispatchers.Default)
+    //postDao.getAll().map { it.map(PostEntity::toDto) }.flowOn(Dispatchers.Default)
 
     override suspend fun updateDao() {
         postDao.updatePostsFromDao()

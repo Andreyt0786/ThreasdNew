@@ -14,8 +14,6 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE hidden = 0 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
 
-    @Query("SELECT * FROM PostEntity")// WHERE hidden = 0 ORDER BY id DESC" убрал пока не работает обновление
-    fun getPagingSource(): PagingSource<Int,PostEntity>
 
     @Query("UPDATE PostEntity SET hidden = 0")
     fun updatePostsFromDao()
