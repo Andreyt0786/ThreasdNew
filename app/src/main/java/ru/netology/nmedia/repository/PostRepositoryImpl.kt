@@ -32,7 +32,7 @@ class PostRepositoryImpl @Inject constructor(
     override val data = Pager(
         config= PagingConfig(pageSize = 10, enablePlaceholders = false),
         pagingSourceFactory = {
-                PostRemoteMediator(
+                PostPagingSource(
                     apiService
         )}
     ).flow
