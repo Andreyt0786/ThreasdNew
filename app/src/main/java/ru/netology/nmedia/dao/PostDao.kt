@@ -1,6 +1,7 @@
 package ru.netology.nmedia.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
@@ -12,6 +13,9 @@ import ru.netology.nmedia.entity.PostEntity
 interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE hidden = 0 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
+
+    @Query("SELECT * FROM PostEntity")// WHERE hidden = 0 ORDER BY id DESC" убрал пока не работает обновление
+    fun getPagingSource(): PagingSource<Int,PostEntity>
 
     @Query("UPDATE PostEntity SET hidden = 0")
     fun updatePostsFromDao()

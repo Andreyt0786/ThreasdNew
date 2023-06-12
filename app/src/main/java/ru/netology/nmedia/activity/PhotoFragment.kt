@@ -54,7 +54,7 @@ class PhotoFragment : Fragment() {
 
         }, viewLifecycleOwner)
 
-        val urlImage = "http://192.168.31.54:9090/media/${arguments?.textArg}"
+        val urlImage = "http://192.168.43.184:9090/media/${arguments?.textArg}"
 
         Glide.with(binding.photoPreview)
             .load(urlImage)
