@@ -71,14 +71,7 @@ class PostViewModel @Inject constructor(
         repository.getNewer(it.posts.firstOrNull()?.id ?: 0L)
             .catch { e -> e.printStackTrace() }
             .asLiveData(Dispatchers.Default)
-    }
 
-    val newer: Flow<Int> = data.flatMapConcat {
-     lastId = it..id?:0L
-        //posts.lastOrNull()?.id ?: 0L
-        repository.getNewer(it.firstOrNull()?.id ?: 0L)
-            .catch { e -> e.printStackTrace() }
-            .flowOn(Dispatchers.Default)
     }*/
 
     init {
