@@ -2,7 +2,9 @@ package ru.netology.nmedia.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -41,7 +43,8 @@ class SignOutFragment(
         val adapter = PostsAdapter(object : OnInteractionListener {
 
             override fun previewPhoto(post: Post) {
-                findNavController().navigate(R.id.action_feedFragment_to_photoFragment,
+                findNavController().navigate(
+                    R.id.action_feedFragment_to_photoFragment,
                     Bundle().apply { textArg = post.attachment?.url })
             }
 
@@ -88,10 +91,6 @@ class SignOutFragment(
             adapter.refresh()
 
         }
-
-
-
-
         return binding.root
     }
 }
