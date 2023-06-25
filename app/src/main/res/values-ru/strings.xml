@@ -40,4 +40,5 @@
     <string name="catch_error">Пожалуйста обновите приложение для получения сообщения нового типа</string>
     <string name="title_error">Необходимо обновновление приложения</string>
     <string name="content_text_error">Пожалуйста обновите приложение</string>
+    <string name="retry">Повторить</string>
 </resources>

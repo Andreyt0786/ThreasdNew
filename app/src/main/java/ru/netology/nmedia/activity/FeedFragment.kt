@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.collectLatest
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.PhotoFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
+import ru.netology.nmedia.adapter.PostLoadingStateAdapter
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -81,7 +82,8 @@ class FeedFragment : Fragment() {
                 startActivity(shareIntent)
             }
         })
-        binding.list.adapter = adapter
+
+
         viewModel.state.observe(viewLifecycleOwner) { state ->
             binding.progress.isVisible = state.loading
             binding.refreshView.isRefreshing = state.refreshing
@@ -141,15 +143,15 @@ class FeedFragment : Fragment() {
 
          }*/
 
-       /* viewModel.newer.observe(viewLifecycleOwner)
-        {
-            count = it
-            if (count == 0) {
-                binding.newPostGroup.isVisible = false
-            } else if (count > 0) {
-                binding.newPostGroup.isVisible = true
-            }
-        }*/
+        /* viewModel.newer.observe(viewLifecycleOwner)
+         {
+             count = it
+             if (count == 0) {
+                 binding.newPostGroup.isVisible = false
+             } else if (count > 0) {
+                 binding.newPostGroup.isVisible = true
+             }
+         }*/
 
         binding.getNewPost.setOnClickListener {
             viewModel.updateFromDao()
@@ -157,12 +159,18 @@ class FeedFragment : Fragment() {
             count = 0
         }
 
+        binding.list.adapter = adapter.withLoadStateHeaderAndFooter(
+            header = PostLoadingStateAdapter {
+                adapter.retry()
+            },
+            footer = PostLoadingStateAdapter {
+                adapter.retry()
+            }
+        )
         lifecycleScope.launchWhenCreated {
             adapter.loadStateFlow.collectLatest { state ->
                 binding.refreshView.isRefreshing =
-                    state.refresh is LoadState.Loading ||
-                            state.prepend is LoadState.Loading ||
-                            state.append is LoadState.Loading
+                    state.refresh is LoadState.Loading
             }
         }
 
